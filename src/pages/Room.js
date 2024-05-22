@@ -2,12 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 import { useSocket } from "../context/Socket";
 import peer from "../services/peer";
+import { FcVideoCall } from "react-icons/fc";
 
 const Room = () => {
   const socket = useSocket();
   const [remoteSocketId, setRemoteSocketId] = useState(null);
   const [myStream, setMyStream] = useState();
   const [remoteStream, setRemoteStream] = useState();
+  const [accept, setAccept] = useState(false);
 
   const handleUserJoined = useCallback(({ email, id }) => {
     console.log(`Email ${email} joined room`);
@@ -22,6 +24,7 @@ const Room = () => {
     const offer = await peer.getOffer();
     socket.emit("user:call", { to: remoteSocketId, offer });
     setMyStream(stream);
+    setAccept(true);
   }, [remoteSocketId, socket]);
 
   const handleIncommingCall = useCallback(
@@ -144,19 +147,18 @@ const Room = () => {
             onClick={sendStreams}
             className="bg-green-400 px-6 py-1 rounded-md"
           >
-            Send Streams
+            Accept Call
           </button>
         )}
         {remoteSocketId && (
           <button
-            className="bg-green-400 px-6 py-1 rounded-md"
+            className="bg-gray-200 px-6 py-1 rounded-md"
             onClick={handleCallUser}
           >
-            Call
+            <FcVideoCall className="h-9 w-9" />
           </button>
         )}
       </div>
-      <h1>Room Page</h1>
       <h4>{remoteSocketId ? "Connected" : "No one is in the room"}</h4>
     </div>
   );
